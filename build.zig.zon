@@ -11,7 +11,10 @@
     .fingerprint = 0x36c3c81a39dac8c9, // Changing this has security and trust implications.
     .minimum_zig_version = "0.16.0-dev.2565+684032671",
     .dependencies = .{
-        // See `zig fetch --save <url>` for a command-line interface for adding dependencies.
+        .zigglgen = .{
+            .url = "git+https://github.com/castholm/zigglgen.git#6b21369ac50de8826f8af60a7edb33693b4ec7bf",
+            .hash = "zigglgen-0.5.0-zigglr_CLwBs1aABtYVtxNPo1SB8AzgKMVouoqULqkDQ",
+        },
     },
     .paths = .{
         "build.zig",

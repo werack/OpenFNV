@@ -53,8 +53,16 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    //exe.root_module.addImport("cimgui", cimgui_mod);
     exe.root_module.addIncludePath(b.path("libs/cimgui/"));
+
+    // OpenGL bindings library https://github.com/castholm/zigglgen
+    const gl_bindings = @import("zigglgen").generateBindingsModule(b, .{
+        .api = .gl,
+        .version = .@"4.6",
+        .profile = .core,
+        .extensions = &.{},
+    });
+    exe.root_module.addImport("gl", gl_bindings);
 
     // link to system libraries
     exe.root_module.linkSystemLibrary("glfw", .{ .needed = true });
