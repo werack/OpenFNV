@@ -13,10 +13,20 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
 
             .imports = &.{},
+
+            .link_libc = true,
+            .link_libcpp = true,
         }),
+        .use_llvm = true, // temp to avoid linker errors about sframe
     });
 
     b.installArtifact(exe);
+
+    const cimgui = @import("libs/cimgui/build.zig").build(b, target, optimize);
+    exe.root_module.addImport("cimgui", cimgui);
+
+    // link to system libraries
+    exe.root_module.linkSystemLibrary("glfw", .{ .needed = true });
 
     const run_step = b.step("run", "Run the app");
 

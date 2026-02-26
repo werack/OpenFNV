@@ -1,7 +1,7 @@
 const std = @import("std");
 const Io = std.Io;
 
-const OpenFNV = @import("OpenFNV");
+const c = @import("cimgui");
 
 pub fn main(init: std.process.Init) !void {
     const arena: std.mem.Allocator = init.arena.allocator();
@@ -11,4 +11,10 @@ pub fn main(init: std.process.Init) !void {
     for (args, 0..) |arg, i| {
         std.log.info("arg[{}]: {s}", .{ i, arg });
     }
+
+    const context = c.ImGui_CreateContext(null);
+    if (context == null) {
+        @panic("Failed to create ImGui context!");
+    }
+    defer c.ImGui_DestroyContext(context);
 }

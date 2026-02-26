@@ -1,0 +1,12 @@
+.{
+    .name = .cimgui,
+    .version = "0.0.0",
+    .fingerprint = 0x49726f5f791e6773, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.16.0-dev.2565+684032671",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
