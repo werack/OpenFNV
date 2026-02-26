@@ -1,0 +1,21 @@
+.{
+    .name = .OpenFNV,
+    .version = "0.0.0",
+
+    // When forking a Zig project, this id should be regenerated (delete the
+    // field and run `zig build`) if the upstream project is still maintained.
+    // Otherwise, the fork is *hostile*, attempting to take control over the
+    // original project's identity. Thus it is recommended to leave the comment
+    // on the following line intact, so that it shows up in code reviews that
+    // modify the field.
+    .fingerprint = 0x36c3c81a39dac8c9, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.16.0-dev.2565+684032671",
+    .dependencies = .{
+        // See `zig fetch --save <url>` for a command-line interface for adding dependencies.
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
