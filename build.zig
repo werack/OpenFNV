@@ -22,8 +22,39 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(exe);
 
-    const cimgui = @import("libs/cimgui/build.zig").build(b, target, optimize);
-    exe.root_module.addImport("cimgui", cimgui);
+    // cimgui module
+    //const cimgui_mod = b.addModule("cimgui", .{
+    //    .root_source_file = b.path("libs/cimgui/src/root.zig"),
+    //    .target = target,
+    //    .optimize = optimize,
+    //});
+
+    exe.root_module.addIncludePath(b.path("deps/imgui"));
+    exe.root_module.addIncludePath(b.path("deps/imgui/backends"));
+    exe.root_module.addIncludePath(b.path("libs/cimgui"));
+    exe.root_module.addCSourceFiles(.{
+        .files = &.{
+            // ImGui core
+            "deps/imgui/imgui.cpp",
+            "deps/imgui/imgui_widgets.cpp",
+            "deps/imgui/imgui_tables.cpp",
+            "deps/imgui/imgui_draw.cpp",
+            "deps/imgui/imgui_demo.cpp",
+            // Backends
+            "deps/imgui/backends/imgui_impl_glfw.cpp",
+            "deps/imgui/backends/imgui_impl_opengl3.cpp",
+
+            // generated from dear_bindings
+            "libs/cimgui/dcimgui.cpp",
+            "libs/cimgui/dcimgui_internal.cpp",
+
+            "libs/cimgui/dcimgui_impl_glfw.cpp",
+            "libs/cimgui/dcimgui_impl_opengl3.cpp",
+        },
+    });
+
+    //exe.root_module.addImport("cimgui", cimgui_mod);
+    exe.root_module.addIncludePath(b.path("libs/cimgui/"));
 
     // link to system libraries
     exe.root_module.linkSystemLibrary("glfw", .{ .needed = true });

@@ -1,7 +1,11 @@
 const std = @import("std");
 const Io = std.Io;
 
-const c = @import("cimgui");
+const c = @cImport({
+    @cInclude("dcimgui.h");
+    @cInclude("dcimgui_impl_glfw.h");
+    @cInclude("dcimgui_impl_opengl3.h");
+});
 
 pub fn main(init: std.process.Init) !void {
     const arena: std.mem.Allocator = init.arena.allocator();
@@ -16,5 +20,5 @@ pub fn main(init: std.process.Init) !void {
     if (context == null) {
         @panic("Failed to create ImGui context!");
     }
-    defer c.ImGui_DestroyContext(context);
+    defer _ = c.ImGui_CreateContext(null);
 }
