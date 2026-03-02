@@ -74,25 +74,11 @@ pub fn igDraw() void {
     lib.cImGui_ImplOpenGL3_NewFrame();
     lib.cImGui_ImplGlfw_NewFrame();
     lib.ImGui_NewFrame();
-
-    // var open: bool = true;
-    //_ = c.ImGui_Begin("BSA Explorer", @ptrCast(&open), c.ImGuiWindowFlags_MenuBar);
-    //if (c.ImGui_BeginMenuBar()) {
-    //    if (c.ImGui_BeginMenu("File")) {
-    //        if (c.ImGui_MenuItem("Open")) {}
-    //
-    //        c.ImGui_EndMenu();
-    //    }
-    //    c.ImGui_EndMenuBar();
-    //}
-    //
-    //c.ImGui_End();
-    lib.ImGui_ShowDemoWindow(@constCast(&true));
-
-    lib.ImGui_Render();
 }
 
 pub fn swapBuffers(window: *Window) void {
+    lib.ImGui_Render();
+
     const handle: *c.GLFWwindow = @ptrCast(@alignCast(window.handle));
 
     lib.cImGui_ImplOpenGL3_RenderDrawData(lib.ImGui_GetDrawData());
