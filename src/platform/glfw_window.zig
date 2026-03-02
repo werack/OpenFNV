@@ -1,6 +1,10 @@
 const std = @import("std");
 const c = @cImport({
     @cInclude("GLFW/glfw3.h");
+
+    @cInclude("dcimgui.h");
+    @cInclude("dcimgui_impl_glfw.h");
+    @cInclude("dcimgui_impl_opengl3.h");
 });
 
 const Window = @import("window.zig").Window;
@@ -50,17 +54,38 @@ pub fn init(
     c.glfwGetFramebufferSize(handle, &_width, &_height);
     gl.Viewport(0, 0, _width, _height);
 
+    // init imgui
+    const ctx = c.ImGui_CreateContext(null);
+    if (ctx == null) @panic("Failed to create ImGui context");
+
+    _ = c.cImGui_ImplGlfw_InitForOpenGL(@ptrCast(handle), true);
+    _ = c.cImGui_ImplOpenGL3_Init();
+    c.ImGui_StyleColorsDark(c.ImGui_GetStyle());
+
     return .{
         .width = width,
         .height = height,
         .title = title,
 
         .handle = handle,
+        .ig_handle = @ptrCast(ctx),
     };
+}
+
+pub fn igDraw() void {
+    c.cImGui_ImplOpenGL3_NewFrame();
+    c.cImGui_ImplGlfw_NewFrame();
+    c.ImGui_NewFrame();
+
+    c.ImGui_ShowDemoWindow(@constCast(&true));
+
+    c.ImGui_Render();
 }
 
 pub fn swapBuffers(window: *Window) void {
     const handle: *c.GLFWwindow = @ptrCast(@alignCast(window.handle));
+
+    c.cImGui_ImplOpenGL3_RenderDrawData(c.ImGui_GetDrawData());
     c.glfwSwapBuffers(handle);
 }
 
@@ -74,6 +99,11 @@ pub fn shouldClose(window: *Window) bool {
 }
 
 pub fn deinit(window: *Window) void {
+    // deinit imgui
+    c.cImGui_ImplOpenGL3_Shutdown();
+    c.cImGui_ImplGlfw_Shutdown();
+    c.ImGui_DestroyContext(@ptrCast(window.ig_handle));
+
     gl.makeProcTableCurrent(null);
 
     const handle: *c.GLFWwindow = @ptrCast(@alignCast(window.handle));

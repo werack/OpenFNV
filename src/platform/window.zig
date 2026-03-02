@@ -14,6 +14,7 @@ pub const Window = struct {
     title: []const u8,
 
     handle: *anyopaque,
+    ig_handle: *anyopaque,
 
     /// Creates a window using glfw
     pub fn init(
@@ -21,8 +22,10 @@ pub const Window = struct {
         height: u32,
         title: []const u8,
     ) !Window {
-        const ret = glfw.init(width, height, title);
+        // init glfw (and imgui)
+        const ret = try glfw.init(width, height, title);
 
+        // init opengl
         gl.Enable(gl.DEPTH_TEST);
 
         gl.Enable(gl.DEBUG_OUTPUT);
@@ -35,6 +38,8 @@ pub const Window = struct {
     pub fn beginDraw(_: *Window) void {
         gl.ClearColor(0.0, 0.0, 0.0, 1.0);
         gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        glfw.igDraw();
     }
 
     pub fn pressed(window: *Window, key: Key) bool {
