@@ -7,17 +7,35 @@ const BSA: [4]u8 = .{ 'B', 'S', 'A', 0 };
 pub const Asset = struct {
     header: Header,
     folder_records: std.ArrayList(FolderRecord),
+    file_record_blocks: std.ArrayList(FileRecordBlock),
 
     pub fn delete(self: *Asset, allocator: std.mem.Allocator) void {
         self.folder_records.deinit(allocator);
     }
 };
 
-pub fn load(path: []const u8, io: std.Io) !void {
-    // init allocator
-    var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
-    const allocator = gpa.allocator();
-    defer _ = gpa.deinit();
+pub const FileRecordBlock = struct {
+    folder_name: std.ArrayList(u8) = .empty,
+    file_records: std.ArrayList(FileRecord) = .empty,
+};
+
+pub const Path = struct {
+    name: std.ArrayList(u8) = .empty,
+};
+
+pub const Paths = struct {
+    path: std.ArrayList(Path) = .empty,
+
+    pub fn deinit(self: *Paths, allocator: std.mem.Allocator) void {
+        for (self.path.items) |*path| {
+            path.name.deinit(allocator);
+        }
+        self.path.deinit(allocator);
+    }
+};
+
+pub fn load(path: []const u8, io: std.Io, allocator: std.mem.Allocator) !?Paths {
+    var paths: Paths = .{};
 
     var asset: Asset = undefined;
     defer asset.delete(allocator);
@@ -37,12 +55,12 @@ pub fn load(path: []const u8, io: std.Io) !void {
         } else {
             bsa_log.err("{}", .{err});
         }
-        return;
+        return null;
     };
 
     if (std.mem.eql(u8, file_id, &BSA) == false) {
         bsa_log.err("file {s} not a BSA file", .{path});
-        return;
+        return null;
     }
 
     // read header
@@ -59,21 +77,37 @@ pub fn load(path: []const u8, io: std.Io) !void {
         _ = i;
     }
 
+    //asset.file_record_blocks = try .initCapacity(allocator, asset.header.folder_count);
     for (0..asset.header.folder_count) |i| {
+        //var file_record_block: FileRecordBlock = .{};
+
         // file record block
         try file_reader.seekTo(asset.folder_records.items[i].offset - asset.header.max_file_name);
 
         const str_size = try reader.takeInt(u8, .little);
         const folder_name: []const u8 = (try reader.take(str_size))[0..str_size];
-        bsa_log.debug("Folder name: {s}", .{folder_name});
+
+        var fpath: Path = .{ .name = .empty };
+        try fpath.name.appendSlice(allocator, folder_name);
+
+        try paths.path.append(allocator, fpath);
+
+        //try file_record_block.folder_name.appendSlice(allocator, folder_name);
 
         // file record
-        for (0..asset.folder_records.items[0].file_count) |j| {
+        //file_record_block.file_records = .initCapacity(allocator, asset.folder_records.items);
+        for (0..asset.folder_records.items[i].file_count) |j| {
             const file_record = try reader.takeStruct(FileRecord, .little);
+
+            //try file_record_block.file_records.append(allocator, file_record);
             _ = file_record;
             _ = j;
         }
+
+        //try asset.file_record_blocks.append(allocator, file_record_block);
     }
+
+    return paths;
 }
 
 // the extern keyword is necessary for takeStruct to work (properly)
