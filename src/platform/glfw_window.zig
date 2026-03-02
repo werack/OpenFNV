@@ -1,11 +1,9 @@
 const std = @import("std");
 const c = @cImport({
     @cInclude("GLFW/glfw3.h");
-
-    @cInclude("dcimgui.h");
-    @cInclude("dcimgui_impl_glfw.h");
-    @cInclude("dcimgui_impl_opengl3.h");
 });
+
+const lib = @import("../lib/lib.zig").zimgui;
 
 const Window = @import("window.zig").Window;
 const Key = @import("window.zig").Key;
@@ -55,12 +53,12 @@ pub fn init(
     gl.Viewport(0, 0, _width, _height);
 
     // init imgui
-    const ctx = c.ImGui_CreateContext(null);
+    const ctx = lib.ImGui_CreateContext(null);
     if (ctx == null) @panic("Failed to create ImGui context");
 
-    _ = c.cImGui_ImplGlfw_InitForOpenGL(@ptrCast(handle), true);
-    _ = c.cImGui_ImplOpenGL3_Init();
-    c.ImGui_StyleColorsDark(c.ImGui_GetStyle());
+    _ = lib.cImGui_ImplGlfw_InitForOpenGL(@ptrCast(handle), true);
+    _ = lib.cImGui_ImplOpenGL3_Init();
+    lib.ImGui_StyleColorsDark(lib.ImGui_GetStyle());
 
     return .{
         .width = width,
@@ -73,19 +71,31 @@ pub fn init(
 }
 
 pub fn igDraw() void {
-    c.cImGui_ImplOpenGL3_NewFrame();
-    c.cImGui_ImplGlfw_NewFrame();
-    c.ImGui_NewFrame();
+    lib.cImGui_ImplOpenGL3_NewFrame();
+    lib.cImGui_ImplGlfw_NewFrame();
+    lib.ImGui_NewFrame();
 
-    c.ImGui_ShowDemoWindow(@constCast(&true));
+    // var open: bool = true;
+    //_ = c.ImGui_Begin("BSA Explorer", @ptrCast(&open), c.ImGuiWindowFlags_MenuBar);
+    //if (c.ImGui_BeginMenuBar()) {
+    //    if (c.ImGui_BeginMenu("File")) {
+    //        if (c.ImGui_MenuItem("Open")) {}
+    //
+    //        c.ImGui_EndMenu();
+    //    }
+    //    c.ImGui_EndMenuBar();
+    //}
+    //
+    //c.ImGui_End();
+    lib.ImGui_ShowDemoWindow(@constCast(&true));
 
-    c.ImGui_Render();
+    lib.ImGui_Render();
 }
 
 pub fn swapBuffers(window: *Window) void {
     const handle: *c.GLFWwindow = @ptrCast(@alignCast(window.handle));
 
-    c.cImGui_ImplOpenGL3_RenderDrawData(c.ImGui_GetDrawData());
+    lib.cImGui_ImplOpenGL3_RenderDrawData(lib.ImGui_GetDrawData());
     c.glfwSwapBuffers(handle);
 }
 
@@ -100,9 +110,9 @@ pub fn shouldClose(window: *Window) bool {
 
 pub fn deinit(window: *Window) void {
     // deinit imgui
-    c.cImGui_ImplOpenGL3_Shutdown();
-    c.cImGui_ImplGlfw_Shutdown();
-    c.ImGui_DestroyContext(@ptrCast(window.ig_handle));
+    lib.cImGui_ImplOpenGL3_Shutdown();
+    lib.cImGui_ImplGlfw_Shutdown();
+    lib.ImGui_DestroyContext(@ptrCast(window.ig_handle));
 
     gl.makeProcTableCurrent(null);
 

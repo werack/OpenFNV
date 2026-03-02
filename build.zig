@@ -21,7 +21,7 @@ pub fn build(b: *std.Build) void {
     // imgui and dear_bindings
     exe.root_module.addIncludePath(b.path("dep/imgui"));
     exe.root_module.addIncludePath(b.path("dep/imgui/backends"));
-    exe.root_module.addIncludePath(b.path("lib/zimgui"));
+    exe.root_module.addIncludePath(b.path("src/lib/zimgui"));
     exe.root_module.addCSourceFiles(.{
         .files = &.{
             // ImGui core
@@ -35,11 +35,11 @@ pub fn build(b: *std.Build) void {
             "dep/imgui/backends/imgui_impl_opengl3.cpp",
 
             // generated from dear_bindings
-            "lib/zimgui/dcimgui.cpp",
-            "lib/zimgui/dcimgui_internal.cpp",
+            "src/lib/zimgui/dcimgui.cpp",
+            "src/lib/zimgui/dcimgui_internal.cpp",
 
-            "lib/zimgui/dcimgui_impl_glfw.cpp",
-            "lib/zimgui/dcimgui_impl_opengl3.cpp",
+            "src/lib/zimgui/dcimgui_impl_glfw.cpp",
+            "src/lib/zimgui/dcimgui_impl_opengl3.cpp",
         },
     });
 
