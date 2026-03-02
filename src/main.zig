@@ -1,29 +1,18 @@
 const std = @import("std");
-const Io = std.Io;
+
+const Window = @import("platform/window.zig").Window;
 
 const BSA = @import("loaders/bsa.zig");
 
 pub fn main(init: std.process.Init) !void {
-    const arena: std.mem.Allocator = init.arena.allocator();
+    var window = try Window.init(640, 480, "OpenFNV");
+    defer window.deinit();
 
-    // Accessing command line arguments:
-    const args = try init.minimal.args.toSlice(arena);
+    while (window.shouldClose() == false) {
+        window.beginDraw();
 
-    for (args, 0..) |arg, i| {
-        std.log.debug("arg[{}]: {s}", .{ i, arg });
+        window.endDraw();
     }
 
-    if (args.len >= 2) {
-        if (std.mem.eql(u8, args[1], "bsa")) {
-            if (args.len >= 3) {
-                BSA.load(args[2], init.io) catch |err| {
-                    std.log.err("{s}: {}", .{ args[2], err });
-                };
-            } else {
-                std.log.err("usage: bsa path/to/bsa/file", .{});
-            }
-        } else {
-            std.log.err("unknown command \"{s}\"", .{args[1]});
-        }
-    }
+    _ = init;
 }
