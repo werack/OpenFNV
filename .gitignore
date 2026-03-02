@@ -3,5 +3,8 @@
 zig-out
 zig-pkg
 
+# ImGui stuff
+imgui.ini
+
 # Other
 assets 
