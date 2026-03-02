@@ -13,8 +13,34 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
 
             .link_libc = true,
+            .link_libcpp = true,
         }),
         .use_llvm = true,
+    });
+
+    // imgui and dear_bindings
+    exe.root_module.addIncludePath(b.path("dep/imgui"));
+    exe.root_module.addIncludePath(b.path("dep/imgui/backends"));
+    exe.root_module.addIncludePath(b.path("lib/zimgui"));
+    exe.root_module.addCSourceFiles(.{
+        .files = &.{
+            // ImGui core
+            "dep/imgui/imgui.cpp",
+            "dep/imgui/imgui_widgets.cpp",
+            "dep/imgui/imgui_tables.cpp",
+            "dep/imgui/imgui_draw.cpp",
+            "dep/imgui/imgui_demo.cpp",
+            // Backends
+            "dep/imgui/backends/imgui_impl_glfw.cpp",
+            "dep/imgui/backends/imgui_impl_opengl3.cpp",
+
+            // generated from dear_bindings
+            "lib/zimgui/dcimgui.cpp",
+            "lib/zimgui/dcimgui_internal.cpp",
+
+            "lib/zimgui/dcimgui_impl_glfw.cpp",
+            "lib/zimgui/dcimgui_impl_opengl3.cpp",
+        },
     });
 
     // Choose the OpenGL API, version, profile and extensions you want to generate bindings for.
